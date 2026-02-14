@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- HTMX フラグメント: 年月セレクトの <option> リスト -->
+<th:block th:fragment="options">
+  <option th:each="m : ${scheduleMonths}"
+          th:value="${m.scheduleMonth}"
+          th:text="${m.scheduleMonth}">2024-1</option>
+</th:block>
+</body>
+</html>

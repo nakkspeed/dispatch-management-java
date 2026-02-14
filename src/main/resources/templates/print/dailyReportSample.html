@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" th:href="@{/css/paper.css}">
+  <style>
+    @page { size: A4; }
+    body { font-family: "Yu Gothic", YuGothic, sans-serif; }
+    .am { width: 210mm; height: 150mm; vertical-align: top; }
+    .pm { width: 210mm; height: 80mm; vertical-align: top; }
+    table { border-collapse: collapse; }
+    th, td { border: solid 1px #000; }
+    pre { font-family: "Yu Gothic", "YuGothic"; font-size: 17px; line-height: 1.2em; }
+  </style>
+  <title>【印刷】定期スケジュール</title>
+</head>
+<body class="A4">
+  <th:block th:each="work : ${schedule.works}">
+    <th:block th:if="${!#strings.isEmpty(work.tasks[0].taskContents) or !#strings.isEmpty(work.tasks[1].taskContents)}">
+      <section class="sheet padding-15mm">
+        <h1>定期スケジュール (<span th:text="${weekLabel}"></span>)</h1>
+        <h2 th:text="${work.name}"></h2>
+        <table>
+          <tr><th>AM</th></tr>
+          <tr><td class="am"><pre th:text="${work.tasks[0].taskContents}"></pre></td></tr>
+          <tr><th>PM</th></tr>
+          <tr><td class="pm"><pre th:text="${work.tasks[1].taskContents}"></pre></td></tr>
+        </table>
+      </section>
+    </th:block>
+  </th:block>
+  <script>
+    window.onload = function() { window.print(); setTimeout(window.close, 0); };
+  </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/htmx.org@2.0.4/dist/htmx.min.js"></script>
+  <title>運行表</title>
+  <style>body { font-family: "BIZ UDPGothic", "Yu Gothic", YuGothic, sans-serif; }</style>
+</head>
+<body>
+<div class="container">
+  <h1 class="h1">運行表</h1>
+  <div class="alert alert-primary" role="alert">
+    [2021/01/31] 画面の文字・配色を Windows PC で読みやすいよう見直しました.<br>
+    [2021/01/31] 月別スケジュール画面で過去日のスケジュールを非表示にしました (スイッチで表示/非表示を切り換えられます).
+  </div>
+
+  <!-- 定期スケジュール選択 -->
+  <form action="/edit_regular_schedules" method="get">
+    <div class="row mb-3">
+      <label for="boardId" class="col-sm-2">定期スケジュール</label>
+      <div class="col-sm-5">
+        <div class="input-group">
+          <select class="form-control" id="boardId" name="boardId"
+                  hx-get="/board/{boardId}/scheduleMonths"
+                  hx-target="#targetMonth"
+                  hx-trigger="change"
+                  hx-include="[name='boardId']">
+            <option th:each="board : ${boards}"
+                    th:value="${board.boardId}"
+                    th:text="${board.boardName}"
+                    th:selected="${board.boardId == defaultBoardId}">チーム名</option>
+          </select>
+          <button class="btn btn-secondary" type="submit">定期スケジュール表示</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- 月別スケジュール選択 -->
+  <form id="monthForm" action="/schedule" method="get">
+    <input type="hidden" id="boardIdHidden" name="boardId" th:value="${defaultBoardId}">
+    <div class="row">
+      <label for="targetMonth" class="col-sm-2">月別スケジュール</label>
+      <div class="col-sm-5">
+        <div class="input-group">
+          <select class="form-control" id="targetMonth" name="targetMonth">
+            <th:block th:fragment="monthOptions">
+              <option th:each="m : ${scheduleMonths}"
+                      th:value="${m.scheduleMonth}"
+                      th:text="${m.scheduleMonth}">年月</option>
+            </th:block>
+          </select>
+          <button class="btn btn-primary" type="submit">月別スケジュール表示</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  // HTMX でボード変更時に年月リストを更新し、hidden フィールドも連動する
+  document.getElementById('boardId').addEventListener('change', function () {
+    document.getElementById('boardIdHidden').value = this.value;
+    // HTMX が hx-get の URL を生成するため、URL テンプレートの {boardId} を差し替える
+    this.setAttribute('hx-get', '/board/' + this.value + '/scheduleMonths');
+  });
+  // HTMX 初期化後に属性を書き換えるため、change イベントで hx-get URL をリフレッシュ
+  document.addEventListener('DOMContentLoaded', function () {
+    var sel = document.getElementById('boardId');
+    if (sel.value) {
+      sel.setAttribute('hx-get', '/board/' + sel.value + '/scheduleMonths');
+      htmx.process(sel);
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" th:href="@{/css/paper.css}">
+  <style>
+    @font-face { font-family: "Yu Gothic"; src: local("Yu Gothic Medium"); font-weight: 100 400; }
+    @font-face { font-family: "Yu Gothic"; src: local("Yu Gothic Bold"); font-weight: bold; }
+    @page { size: A4; }
+    .am { width: 210mm; height: 150mm; vertical-align: top; }
+    .pm { width: 210mm; height: 80mm; vertical-align: top; }
+    table { border-collapse: collapse; }
+    th, td { border: solid 1px #000; }
+    pre { font-family: "Yu Gothic", "YuGothic"; font-size: 17px; line-height: 1.2em; font-weight: bold; }
+  </style>
+  <title>日報</title>
+</head>
+<body class="A4">
+  <th:block th:each="work : ${schedule.works}">
+    <th:block th:if="${!#strings.isEmpty(work.tasks[0].taskContents) or !#strings.isEmpty(work.tasks[1].taskContents)}">
+      <section class="sheet padding-15mm">
+        <h2>
+          <span th:text="${#temporals.format(schedule.scheduleDate, 'yyyy/M/d')}"></span>
+          (<span th:text="${dayOfWeekJp}"></span>)
+          / <span th:text="${work.name}"></span> 日報（担当：<span th:each="s,i : ${work.tasks[0].staffs}"
+            th:text="${s.nickname + (i.last ? '' : '　')}"></span>）
+        </h2>
+        <table>
+          <tr><th>AM</th></tr>
+          <tr><td class="am"><pre th:text="${work.tasks[0].taskContents}"></pre></td></tr>
+          <tr><th>PM</th></tr>
+          <tr><td class="pm"><pre th:text="${work.tasks[1].taskContents}"></pre></td></tr>
+        </table>
+      </section>
+    </th:block>
+  </th:block>
+  <script>
+    window.onload = function() { window.print(); setTimeout(window.close, 0); };
+  </script>
+</body>
+</html>

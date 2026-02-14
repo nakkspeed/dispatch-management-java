@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <title>月別スケジュール</title>
+  <style>
+    body { font-family: "BIZ UDPGothic", "Yu Gothic", YuGothic, sans-serif; }
+    table { table-layout: fixed; }
+    .cut { overflow: hidden; text-overflow: ellipsis; font-family: "BIZ UDPGothic", "Yu Gothic", YuGothic, sans-serif; }
+    .table-cellhover > tbody > tr > td:hover { background-color: rgb(253, 247, 238) !important; }
+    .table-cellhover > tbody > tr:hover > td { background-color: inherit; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="container-fluid bg-light">
+    <h1 class="fs-3" id="pageTitle">月別スケジュール</h1>
+    <div class="row mb-2">
+      <div class="col-auto">
+        <div class="form-check form-switch fs-5">
+          <input class="form-check-input" id="filter-past-day" type="checkbox">
+          <label class="form-check-label" for="filter-past-day">過去日を表示する</label>
+        </div>
+      </div>
+      <div class="col-auto">
+        <div class="form-check form-switch fs-5">
+          <input class="form-check-input" id="filter-show-detail" type="checkbox">
+          <label class="form-check-label" for="filter-show-detail">表示条件を詳細指定する</label>
+        </div>
+      </div>
+    </div>
+    <div id="detail-filters" style="display:none">
+      <div class="row">
+        <div class="col-1">表示</div>
+        <div class="col">
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" id="filter-am" type="checkbox" checked>
+            <label class="form-check-label" for="filter-am">AM</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" id="filter-pm" type="checkbox" checked>
+            <label class="form-check-label" for="filter-pm">PM</label>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-2">
+        <div class="col-1"></div>
+        <div class="col" id="dow-filters"></div>
+      </div>
+      <div class="row mt-2 pb-2">
+        <div class="col-1"></div>
+        <div class="col" id="week-filters"></div>
+      </div>
+    </div>
+  </div>
+  <table class="table table-cellhover" id="schedule-table"></table>
+</div>
+
+<!-- サーバーから埋め込むパラメータ -->
+<script th:inline="javascript">
+  const BOARD_ID = /*[[${boardId}]]*/ 0;
+  const TARGET_MONTH = /*[[${targetMonth}]]*/ '';
+</script>
+<script th:src="@{/js/schedule.js}"></script>
+</body>
+</html>
