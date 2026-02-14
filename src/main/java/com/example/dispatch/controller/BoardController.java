@@ -6,7 +6,6 @@ import com.example.dispatch.model.Staff;
 import com.example.dispatch.service.BoardService;
 import com.example.dispatch.service.ScheduleService;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,8 +13,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,21 +39,41 @@ public class BoardController {
         return boardService.findAll();
     }
 
-    /** ボード新規作成 API (ボード登録 + 定期スケジュール初期化を一括実行) */
+    /** ボード新規作成 (フォーム送信 → PRGパターン) */
     @PostMapping("/board/create")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> createBoard(@RequestBody Map<String, Object> body) {
-        int boardId = ((Number) body.get("boardId")).intValue();
-        String boardName = (String) body.get("boardName");
-        @SuppressWarnings("unchecked")
-        List<String> routes = (List<String>) body.get("routes");
-        try {
-            boardService.createBoard(boardId, boardName, routes);
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("error", "ボードID " + boardId + " は既に使用されています。別のIDを指定してください。"));
+    public String createBoard(
+            @RequestParam int boardId,
+            @RequestParam String boardName,
+            @RequestParam(required = false) List<String> routes,
+            Model model) {
+        List<String> filteredRoutes = (routes != null) ? routes.stream()
+                .map(String::trim)
+                .filter(r -> !r.isEmpty())
+                .collect(Collectors.toList()) : List.of();
+
+        if (boardName.isBlank()) {
+            return renderBoardCreateWithError(model, boardId, boardName, routes, "ボード名を入力してください");
         }
-        return ResponseEntity.ok(Map.of("boardId", boardId));
+        if (filteredRoutes.isEmpty()) {
+            return renderBoardCreateWithError(model, boardId, boardName, routes, "ルートを1件以上入力してください");
+        }
+
+        try {
+            boardService.createBoard(boardId, boardName, filteredRoutes);
+        } catch (DataIntegrityViolationException e) {
+            return renderBoardCreateWithError(model, boardId, boardName, filteredRoutes,
+                    "ボードID " + boardId + " は既に使用されています。別のIDを指定してください。");
+        }
+        return "redirect:/staff-maintenance?boardId=" + boardId;
+    }
+
+    private String renderBoardCreateWithError(Model model, Integer boardId, String boardName,
+            List<String> routes, String errorMessage) {
+        model.addAttribute("routes", (routes != null && !routes.isEmpty()) ? new ArrayList<>(routes) : List.of("内勤"));
+        model.addAttribute("boardId", boardId);
+        model.addAttribute("boardName", boardName != null ? boardName : "");
+        model.addAttribute("errorMessage", errorMessage);
+        return "boardCreate";
     }
 
     /** スタッフ一覧更新 API */
@@ -67,6 +88,55 @@ public class BoardController {
                 .collect(Collectors.toList());
         boardService.updateStaffs(boardId, List.of(group0, List.of()));
         return ResponseEntity.ok(Map.of("boardId", boardId, "count", group0.size()));
+    }
+
+    /** スタッフ追加 (フォーム → PRG) */
+    @PostMapping("/staff/{boardId}/add")
+    public String addStaff(@PathVariable int boardId, @RequestParam String name) {
+        List<Staff> staffs = currentStaffs(boardId);
+        String trimmed = name.trim();
+        if (!trimmed.isEmpty()) {
+            staffs.add(new Staff(trimmed));
+            boardService.updateStaffs(boardId, List.of(staffs, List.of()));
+        }
+        return "redirect:/staff-maintenance?boardId=" + boardId;
+    }
+
+    /** スタッフ削除 (フォーム → PRG) */
+    @PostMapping("/staff/{boardId}/{idx}/delete")
+    public String deleteStaff(@PathVariable int boardId, @PathVariable int idx) {
+        List<Staff> staffs = currentStaffs(boardId);
+        if (idx >= 0 && idx < staffs.size()) {
+            staffs.remove(idx);
+            boardService.updateStaffs(boardId, List.of(staffs, List.of()));
+        }
+        return "redirect:/staff-maintenance?boardId=" + boardId;
+    }
+
+    /** スタッフ並び順変更 (フォーム → PRG) */
+    @PostMapping("/staff/{boardId}/{idx}/move")
+    public String moveStaff(@PathVariable int boardId, @PathVariable int idx,
+            @RequestParam String direction) {
+        List<Staff> staffs = currentStaffs(boardId);
+        int swapWith = "up".equals(direction) ? idx - 1 : idx + 1;
+        if (swapWith >= 0 && swapWith < staffs.size()) {
+            Staff tmp = staffs.get(idx);
+            staffs.set(idx, staffs.get(swapWith));
+            staffs.set(swapWith, tmp);
+            boardService.updateStaffs(boardId, List.of(staffs, List.of()));
+        }
+        return "redirect:/staff-maintenance?boardId=" + boardId;
+    }
+
+    private List<Staff> currentStaffs(int boardId) {
+        return boardService.findAll().stream()
+                .filter(b -> b.boardId() == boardId)
+                .findFirst()
+                .map(b -> {
+                    List<List<Staff>> allGroups = b.staffs();
+                    return allGroups.isEmpty() ? new ArrayList<Staff>() : new ArrayList<>(allGroups.get(0));
+                })
+                .orElseGet(ArrayList::new);
     }
 
     /**

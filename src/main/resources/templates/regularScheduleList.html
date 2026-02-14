@@ -16,43 +16,106 @@
   </style>
 </head>
 <body>
-<div id="app">
-  <div class="container-fluid bg-light">
-    <div class="d-flex align-items-center mb-1">
-      <a href="/" class="btn btn-outline-secondary btn-sm me-3">← トップ</a>
-      <h1 class="fs-3 mb-0">定期スケジュール</h1>
-    </div>
-    <div class="row">
-      <div class="col-1">表示</div>
-      <div class="col">
+<div class="container-fluid bg-light">
+  <div class="d-flex align-items-center mb-1">
+    <a href="/" class="btn btn-outline-secondary btn-sm me-3">← トップ</a>
+    <h1 class="fs-3 mb-0">定期スケジュール</h1>
+  </div>
+
+  <!-- フィルター + 月別生成フォーム -->
+  <form method="get" th:action="@{/edit_regular_schedules}" class="mb-2">
+    <input type="hidden" name="boardId" th:value="${boardId}">
+    <input type="hidden" name="filterActive" value="true">
+
+    <div class="row g-2 align-items-center">
+      <div class="col-auto">
         <div class="form-check form-check-inline">
-          <input class="form-check-input" id="filter-am" type="checkbox" checked>
+          <input class="form-check-input" id="filter-am" type="checkbox"
+                 name="showAm" value="true" th:checked="${showAm}">
           <label class="form-check-label" for="filter-am">AM</label>
         </div>
         <div class="form-check form-check-inline">
-          <input class="form-check-input" id="filter-pm" type="checkbox" checked>
+          <input class="form-check-input" id="filter-pm" type="checkbox"
+                 name="showPm" value="true" th:checked="${showPm}">
           <label class="form-check-label" for="filter-pm">PM</label>
         </div>
       </div>
     </div>
-    <div class="row mt-2">
-      <div class="col-1"></div>
-      <div class="col" id="dow-filters"></div>
-    </div>
-    <div class="row mt-2 pb-2">
-      <div class="col-1"></div>
-      <div class="col" id="week-filters">
+
+    <div class="row mt-1 g-2 align-items-center">
+      <div class="col-auto">
+        <span th:each="day,i : ${daysJp}" class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox"
+                 th:id="'filter-dow-' + ${i.index}"
+                 name="dow" th:value="${i.index}"
+                 th:checked="${selectedDow.contains(i.index)}">
+          <label class="form-check-label" th:for="'filter-dow-' + ${i.index}"
+                 th:text="${day} + '曜'"></label>
+        </span>
       </div>
       <div class="col-auto">
-        <div class="input-group">
-          <input type="month" class="form-control" id="fromDate">
-          <button class="btn btn-primary" type="button" id="createBtn">月別スケジュール作成</button>
-        </div>
+        <span th:each="w : ${#numbers.sequence(0, 4)}" class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox"
+                 th:id="'filter-week-' + ${w}"
+                 name="week" th:value="${w}"
+                 th:checked="${selectedWeek.contains(w)}">
+          <label class="form-check-label" th:for="'filter-week-' + ${w}"
+                 th:text="${w + 1} + '週目'"></label>
+        </span>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-outline-dark btn-sm">フィルター適用</button>
       </div>
     </div>
+  </form>
+
+  <!-- 月別スケジュール生成フォーム（フィルターとは独立） -->
+  <div class="pb-2">
+    <form th:action="@{/schedule/{id}/createByMonthForm(id=${boardId})}" method="post"
+          class="d-inline-flex gap-0">
+      <input type="month" class="form-control" id="fromDate" name="fromDate" required
+             style="border-radius: 0.375rem 0 0 0.375rem; max-width: 180px;">
+      <button class="btn btn-primary" type="submit"
+              style="border-radius: 0 0.375rem 0.375rem 0;">月別スケジュール作成</button>
+    </form>
   </div>
-  <table class="table table-cellhover" id="schedule-table"></table>
 </div>
+
+<!-- スケジュールテーブル -->
+<table class="table table-cellhover" id="schedule-table">
+  <th:block th:each="s : ${schedules}">
+    <thead>
+      <tr class="bg-dark bg-gradient text-light">
+        <th class="fs-5" style="width:7em">
+          <span th:text="|第${s.week + 1}${daysJp[s.dayOfWeek]}曜|"></span>
+          <i class="fa fa-print" style="cursor:pointer"
+             th:attr="onclick='openReport(' + ${s.id} + ')'"></i>
+        </th>
+        <th th:each="work : ${s.works}" class="fs-6" th:text="${work.name}"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- AM行 -->
+      <tr th:if="${showAm}">
+        <th class="table-secondary"><div class="fs-6">AM</div></th>
+        <td th:each="work,wi : ${s.works}"
+            ondblclick="editCell(event)"
+            th:data-sid="${s.id}" th:data-widx="${wi.index}" data-tidx="0">
+          <pre class="cut cell-text" th:text="${work.tasks.get(0).taskContents}"></pre>
+        </td>
+      </tr>
+      <!-- PM行 -->
+      <tr th:if="${showPm}">
+        <th class="table-secondary"><div class="fs-6">PM</div></th>
+        <td th:each="work,wi : ${s.works}"
+            ondblclick="editCell(event)"
+            th:data-sid="${s.id}" th:data-widx="${wi.index}" data-tidx="1">
+          <pre class="cut cell-text" th:text="${work.tasks.get(1).taskContents}"></pre>
+        </td>
+      </tr>
+    </tbody>
+  </th:block>
+</table>
 
 <!-- エラートースト -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:1100">
@@ -66,6 +129,19 @@
 
 <script th:inline="javascript">
   const BOARD_ID = /*[[${boardId}]]*/ 0;
+  const SHOW_AM  = /*[[${showAm}]]*/ true;
+  const SHOW_PM  = /*[[${showPm}]]*/ true;
+  const schedulesJson = /*[[${schedulesJson}]]*/ '[]';
+  const schedules = JSON.parse(schedulesJson);
+
+  // 翌月をデフォルト設定
+  (function() {
+    const next = new Date();
+    next.setMonth(next.getMonth() + 1);
+    const mm = String(next.getMonth() + 1).padStart(2, '0');
+    document.getElementById('fromDate').value = next.getFullYear() + '-' + mm;
+  })();
+
   function showErrorToast(msg) {
     const el = document.getElementById('errorToast');
     document.getElementById('errorToastMsg').textContent = msg;
