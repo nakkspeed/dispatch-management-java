@@ -5,6 +5,7 @@ import com.example.dispatch.model.Staff;
 import com.example.dispatch.repository.BoardRepository;
 import com.example.dispatch.repository.RegularScheduleRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,9 +24,11 @@ public class BoardService {
         return boardRepository.findAll();
     }
 
-    /** 指定ボードの定期スケジュール初期データ (5週×7日) を生成する */
-    public void initialize(int boardId) {
-        regularScheduleRepository.create(boardId);
+    /** ボードと定期スケジュール (5週×7日) を一括作成する */
+    @Transactional
+    public void createBoard(int boardId, String boardName, List<String> routes) {
+        boardRepository.create(boardId, boardName);
+        regularScheduleRepository.create(boardId, routes);
     }
 
     /** 指定ボードのスタッフ一覧を更新する */

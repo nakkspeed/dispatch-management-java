@@ -122,7 +122,7 @@ async function saveSchedule(sid) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(s)
-    }).catch(() => alert('更新に失敗しました'));
+    }).catch(() => showErrorToast('更新に失敗しました'));
 }
 
 function openReport(id) { window.open('/dailyReportSample?scheduleId=' + id); }

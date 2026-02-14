@@ -82,6 +82,12 @@ public class PageController {
         return "print/dailyReport";
     }
 
+    /** ボード追加画面 */
+    @GetMapping("/board-create")
+    public String boardCreate() {
+        return "boardCreate";
+    }
+
     /** スタッフメンテナンス画面 */
     @GetMapping("/staff-maintenance")
     public String staffMaintenance(@RequestParam(required = false) Integer boardId, Model model) {

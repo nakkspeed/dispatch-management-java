@@ -29,6 +29,18 @@ public class BoardRepository {
         );
     }
 
+    public void create(int boardId, String boardName) {
+        try {
+            String staffsJson = objectMapper.writeValueAsString(List.of(List.of(), List.of()));
+            jdbc.update(
+                    "INSERT INTO boards (board_id, board_name, staffs) VALUES (?, ?, ?::json)",
+                    boardId, boardName, staffsJson
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create board", e);
+        }
+    }
+
     public void updateStaffs(int boardId, List<List<Staff>> staffs) {
         try {
             String staffsJson = objectMapper.writeValueAsString(staffs);

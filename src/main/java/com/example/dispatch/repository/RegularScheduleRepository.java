@@ -22,9 +22,9 @@ public class RegularScheduleRepository {
         this.objectMapper = objectMapper;
     }
 
-    public void create(int boardId) {
+    public void create(int boardId, List<String> routes) {
         String sql = "INSERT INTO regular_schedules (board_id, week, day_of_week, works) VALUES (?, ?, ?, ?::json)";
-        String worksJson = toJson(Work.empty());
+        String worksJson = toJson(Work.empty(routes));
         for (int week = 0; week < 5; week++) {
             for (int dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
                 jdbc.update(sql, boardId, week, dayOfWeek, worksJson);

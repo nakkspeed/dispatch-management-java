@@ -5,6 +5,8 @@ import com.example.dispatch.model.ScheduleMonth;
 import com.example.dispatch.model.Staff;
 import com.example.dispatch.service.BoardService;
 import com.example.dispatch.service.ScheduleService;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,11 +38,20 @@ public class BoardController {
         return boardService.findAll();
     }
 
-    /** スケジュールボード初期セットアップ API */
-    @GetMapping("/initialize/{boardId}")
+    /** ボード新規作成 API (ボード登録 + 定期スケジュール初期化を一括実行) */
+    @PostMapping("/board/create")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> initialize(@PathVariable int boardId) {
-        boardService.initialize(boardId);
+    public ResponseEntity<Map<String, Object>> createBoard(@RequestBody Map<String, Object> body) {
+        int boardId = ((Number) body.get("boardId")).intValue();
+        String boardName = (String) body.get("boardName");
+        @SuppressWarnings("unchecked")
+        List<String> routes = (List<String>) body.get("routes");
+        try {
+            boardService.createBoard(boardId, boardName, routes);
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", "ボードID " + boardId + " は既に使用されています。別のIDを指定してください。"));
+        }
         return ResponseEntity.ok(Map.of("boardId", boardId));
     }
 

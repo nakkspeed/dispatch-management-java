@@ -10,7 +10,11 @@ public record Work(String name, List<Task> tasks) {
     );
 
     public static List<Work> empty() {
-        return NAMES.stream()
+        return empty(NAMES);
+    }
+
+    public static List<Work> empty(List<String> routeNames) {
+        return routeNames.stream()
                 .map(n -> new Work(n, List.of(Task.emptyAm(), Task.emptyPm())))
                 .toList();
     }
