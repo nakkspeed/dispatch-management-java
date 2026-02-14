@@ -66,6 +66,7 @@ public class PageController {
             @RequestParam String targetMonth,
             @RequestParam(required = false, defaultValue = "false") boolean filterActive,
             @RequestParam(required = false, defaultValue = "false") boolean showPastDay,
+            @RequestParam(required = false, defaultValue = "false") boolean showDetail,
             @RequestParam(required = false, defaultValue = "false") boolean showAm,
             @RequestParam(required = false, defaultValue = "false") boolean showPm,
             @RequestParam(required = false) List<Integer> dow,
@@ -112,6 +113,7 @@ public class PageController {
         model.addAttribute("showAm", effectiveShowAm);
         model.addAttribute("showPm", effectiveShowPm);
         model.addAttribute("showPastDay", effectiveShowPastDay);
+        model.addAttribute("showDetail", showDetail);
         model.addAttribute("selectedDow", effectiveDow);
         model.addAttribute("selectedWeek", effectiveWeek);
         model.addAttribute("filterActive", filterActive);
@@ -128,6 +130,7 @@ public class PageController {
     public String editRegularSchedules(
             @RequestParam int boardId,
             @RequestParam(required = false, defaultValue = "false") boolean filterActive,
+            @RequestParam(required = false, defaultValue = "false") boolean showDetail,
             @RequestParam(required = false, defaultValue = "false") boolean showAm,
             @RequestParam(required = false, defaultValue = "false") boolean showPm,
             @RequestParam(required = false) List<Integer> dow,
@@ -164,6 +167,7 @@ public class PageController {
         model.addAttribute("schedules", filtered);
         model.addAttribute("showAm", effectiveShowAm);
         model.addAttribute("showPm", effectiveShowPm);
+        model.addAttribute("showDetail", showDetail);
         model.addAttribute("selectedDow", effectiveDow);
         model.addAttribute("selectedWeek", effectiveWeek);
         model.addAttribute("filterActive", filterActive);
