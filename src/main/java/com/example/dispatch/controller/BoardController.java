@@ -2,6 +2,7 @@ package com.example.dispatch.controller;
 
 import com.example.dispatch.model.Board;
 import com.example.dispatch.model.ScheduleMonth;
+import com.example.dispatch.model.Staff;
 import com.example.dispatch.service.BoardService;
 import com.example.dispatch.service.ScheduleService;
 import org.springframework.http.ResponseEntity;
@@ -9,10 +10,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class BoardController {
@@ -38,6 +42,20 @@ public class BoardController {
     public ResponseEntity<Map<String, Object>> initialize(@PathVariable int boardId) {
         boardService.initialize(boardId);
         return ResponseEntity.ok(Map.of("boardId", boardId));
+    }
+
+    /** スタッフ一覧更新 API */
+    @PostMapping("/staff/{boardId}/update")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateStaffs(
+            @PathVariable int boardId,
+            @RequestBody Map<String, List<String>> body) {
+        List<String> nicknames = body.getOrDefault("staffs", List.of());
+        List<Staff> group0 = nicknames.stream()
+                .map(Staff::new)
+                .collect(Collectors.toList());
+        boardService.updateStaffs(boardId, List.of(group0, List.of()));
+        return ResponseEntity.ok(Map.of("boardId", boardId, "count", group0.size()));
     }
 
     /**

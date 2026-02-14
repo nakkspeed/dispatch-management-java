@@ -4,6 +4,7 @@ import com.example.dispatch.model.Board;
 import com.example.dispatch.model.RegularSchedule;
 import com.example.dispatch.model.Schedule;
 import com.example.dispatch.model.ScheduleMonth;
+import com.example.dispatch.model.Staff;
 import com.example.dispatch.service.BoardService;
 import com.example.dispatch.service.RegularScheduleService;
 import com.example.dispatch.service.ScheduleService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class PageController {
@@ -78,6 +80,34 @@ public class PageController {
         model.addAttribute("schedule", schedule);
         model.addAttribute("dayOfWeekJp", DAY_OF_WEEK_JP[schedule.dayOfWeek()]);
         return "print/dailyReport";
+    }
+
+    /** スタッフメンテナンス画面 */
+    @GetMapping("/staff-maintenance")
+    public String staffMaintenance(@RequestParam(required = false) Integer boardId, Model model) {
+        List<Board> boards = boardService.findAll();
+        model.addAttribute("boards", boards);
+
+        Board currentBoard = null;
+        if (boardId != null) {
+            currentBoard = boards.stream()
+                    .filter(b -> b.boardId() == boardId)
+                    .findFirst()
+                    .orElse(null);
+        }
+        if (currentBoard == null && !boards.isEmpty()) {
+            currentBoard = boards.get(0);
+        }
+        model.addAttribute("currentBoard", currentBoard);
+
+        List<String> staffNicknames = List.of();
+        if (currentBoard != null && !currentBoard.staffs().isEmpty()) {
+            staffNicknames = currentBoard.staffs().get(0).stream()
+                    .map(Staff::nickname)
+                    .collect(Collectors.toList());
+        }
+        model.addAttribute("staffNicknames", staffNicknames);
+        return "staffMaintenance";
     }
 
     /** 定期スケジュール印刷画面 (サーバーサイドレンダリング) */

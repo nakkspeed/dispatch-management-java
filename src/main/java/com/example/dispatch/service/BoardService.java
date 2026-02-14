@@ -1,6 +1,7 @@
 package com.example.dispatch.service;
 
 import com.example.dispatch.model.Board;
+import com.example.dispatch.model.Staff;
 import com.example.dispatch.repository.BoardRepository;
 import com.example.dispatch.repository.RegularScheduleRepository;
 import org.springframework.stereotype.Service;
@@ -25,5 +26,10 @@ public class BoardService {
     /** 指定ボードの定期スケジュール初期データ (5週×7日) を生成する */
     public void initialize(int boardId) {
         regularScheduleRepository.create(boardId);
+    }
+
+    /** 指定ボードのスタッフ一覧を更新する */
+    public void updateStaffs(int boardId, List<List<Staff>> staffs) {
+        boardRepository.updateStaffs(boardId, staffs);
     }
 }

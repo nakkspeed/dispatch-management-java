@@ -29,6 +29,18 @@ public class BoardRepository {
         );
     }
 
+    public void updateStaffs(int boardId, List<List<Staff>> staffs) {
+        try {
+            String staffsJson = objectMapper.writeValueAsString(staffs);
+            jdbc.update(
+                    "UPDATE boards SET staffs = ?::json WHERE board_id = ?",
+                    staffsJson, boardId
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize staffs JSON", e);
+        }
+    }
+
     private Board mapBoard(ResultSet rs, int rowNum) throws SQLException {
         try {
             List<List<Staff>> staffs = objectMapper.readValue(
