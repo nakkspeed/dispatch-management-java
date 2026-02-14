@@ -89,11 +89,9 @@
 
     <!-- 追加フォーム -->
     <div class="card-footer">
-      <form th:action="@{/staff/{id}/add(id=${currentBoard.boardId})}" method="post"
-            class="d-flex gap-2">
+      <form th:action="@{/staff/{id}/add(id=${currentBoard.boardId})}" method="post">
         <input type="text" name="name" class="form-control"
-               placeholder="スタッフ名を入力" required>
-        <button type="submit" class="btn btn-success">＋ 追加</button>
+               placeholder="スタッフ名を入力してEnter" required autofocus>
       </form>
     </div>
   </div>
