@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//usr/lib/**)",
+      "Read(//home/**)"
+    ]
+  }
+}

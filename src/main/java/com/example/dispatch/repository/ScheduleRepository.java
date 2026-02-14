@@ -117,8 +117,8 @@ public class ScheduleRepository {
 
     private Schedule mapRow(ResultSet rs, int rowNum) throws SQLException {
         try {
-            List<Work> works = objectMapper.readValue(rs.getString("works"), new TypeReference<>() {});
-            List<List<Staff>> staffs = objectMapper.readValue(rs.getString("staffs"), new TypeReference<>() {});
+            List<Work> works = objectMapper.readValue(readJsonString(rs, "works"), new TypeReference<>() {});
+            List<List<Staff>> staffs = objectMapper.readValue(readJsonString(rs, "staffs"), new TypeReference<>() {});
             return new Schedule(
                     rs.getInt("id"),
                     rs.getInt("board_id"),
@@ -130,6 +130,23 @@ public class ScheduleRepository {
             );
         } catch (Exception e) {
             throw new SQLException("Failed to parse schedule JSON", e);
+        }
+    }
+
+    /**
+     * H2 の PostgreSQL 互換モードでは JSON 型カラムを getString() で取得すると
+     * 値が JSON 文字列として二重エンコードされる場合がある。
+     * その場合はアンラップして生の JSON 文字列を返す。
+     */
+    private String readJsonString(ResultSet rs, String column) throws SQLException {
+        String value = rs.getString(column);
+        if (value == null || !value.startsWith("\"")) {
+            return value;
+        }
+        try {
+            return objectMapper.readValue(value, String.class);
+        } catch (Exception e) {
+            return value;
         }
     }
 }
