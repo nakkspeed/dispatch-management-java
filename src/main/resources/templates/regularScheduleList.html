@@ -14,7 +14,6 @@
   <div class="d-flex align-items-center mb-1">
     <a href="/" class="btn btn-outline-secondary btn-sm me-3">← トップ</a>
     <h1 class="fs-3 mb-0">定期スケジュール</h1>
-    <a th:href="@{/staff-maintenance(boardId=${boardId})}" class="btn btn-outline-secondary btn-sm ms-3">スタッフ管理</a>
   </div>
 
   <!-- フィルター + 月別生成フォーム -->
@@ -78,17 +77,23 @@
     );
   </script>
 
-  <!-- エラーメッセージ -->
-  <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
-
-  <!-- 月別スケジュール生成フォーム（フィルターとは独立） -->
-  <div class="pb-2">
+  <!-- スタッフ + 月別スケジュール作成 -->
+  <div class="d-flex align-items-center gap-2 pb-2">
+    <span class="fw-bold">スタッフ：</span>
+    <span th:if="${!staffNicknames.isEmpty()}"
+          th:text="${#strings.listJoin(staffNicknames, '、')}"></span>
+    <span th:if="${staffNicknames.isEmpty()}" class="text-danger">スタッフを登録してください</span>
+    <a th:href="@{/staff-maintenance(boardId=${boardId})}"
+       th:class="${staffNicknames.isEmpty()}
+         ? 'btn btn-primary btn-sm'
+         : 'btn btn-outline-secondary btn-sm'">スタッフ管理</a>
     <form th:action="@{/schedule/{id}/createByMonthForm(id=${boardId})}" method="post"
-          class="d-inline-flex gap-0">
+          class="d-inline-flex gap-0 ms-auto">
       <input type="month" class="form-control" id="fromDate" name="fromDate" required
-             style="border-radius: 0.375rem 0 0 0.375rem; max-width: 180px;">
+             style="border-radius:0.375rem 0 0 0.375rem; max-width:180px;">
       <button class="btn btn-primary text-nowrap" type="submit"
-              style="border-radius: 0 0.375rem 0.375rem 0;">月別スケジュール作成</button>
+              th:disabled="${staffNicknames.isEmpty()}"
+              style="border-radius:0 0.375rem 0.375rem 0;">月別スケジュール作成</button>
     </form>
   </div>
 </div>
@@ -159,6 +164,10 @@
     document.getElementById('errorToastMsg').textContent = msg;
     bootstrap.Toast.getOrCreateInstance(el, { autohide: false }).show();
   }
+
+  // サーバーバリデーションエラーをトースト表示
+  const toastError = /*[[${toastError}]]*/ null;
+  if (toastError) showErrorToast(toastError);
 </script>
 <script th:src="@{/js/regularSchedule.js}"></script>
 </body>

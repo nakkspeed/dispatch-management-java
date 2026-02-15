@@ -174,6 +174,18 @@ public class PageController {
         model.addAttribute("filterActive", filterActive);
         model.addAttribute("daysJp", DAY_OF_WEEK_JP);
         model.addAttribute("boardId", boardId);
+
+        // スタッフ情報
+        List<String> staffNicknames = boardService.findAll().stream()
+                .filter(b -> b.boardId() == boardId)
+                .findFirst()
+                .map(b -> b.staffs().isEmpty() ? List.<Staff>of() : b.staffs().get(0))
+                .orElse(List.of())
+                .stream()
+                .map(Staff::nickname)
+                .collect(Collectors.toList());
+        model.addAttribute("staffNicknames", staffNicknames);
+
         return "regularScheduleList";
     }
 
@@ -259,7 +271,7 @@ public class PageController {
         boolean hasStaffs = board != null && !board.staffs().isEmpty()
                 && !board.staffs().get(0).isEmpty();
         if (!hasStaffs) {
-            redirectAttributes.addFlashAttribute("errorMessage",
+            redirectAttributes.addFlashAttribute("toastError",
                     "スタッフが登録されていません。スタッフ管理画面で登録してください。");
             return "redirect:/edit_regular_schedules?boardId=" + boardId;
         }
