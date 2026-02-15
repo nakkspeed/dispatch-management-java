@@ -123,6 +123,9 @@ public class PageController {
         model.addAttribute("targetMonth", targetMonth);
         model.addAttribute("year", year);
         model.addAttribute("month", month);
+        model.addAttribute("boardName", boardService.findAll().stream()
+                .filter(b -> b.boardId() == boardId).findFirst()
+                .map(Board::boardName).orElse(""));
         return "scheduleList";
     }
 
@@ -174,6 +177,9 @@ public class PageController {
         model.addAttribute("filterActive", filterActive);
         model.addAttribute("daysJp", DAY_OF_WEEK_JP);
         model.addAttribute("boardId", boardId);
+        model.addAttribute("boardName", boardService.findAll().stream()
+                .filter(b -> b.boardId() == boardId).findFirst()
+                .map(Board::boardName).orElse(""));
 
         // スタッフ情報
         List<String> staffNicknames = boardService.findAll().stream()

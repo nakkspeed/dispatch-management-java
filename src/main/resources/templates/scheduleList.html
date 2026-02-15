@@ -7,13 +7,13 @@
   <link rel="stylesheet" th:href="@{/css/font-awesome.min.css}">
   <link rel="stylesheet" th:href="@{/css/app.css}">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <title th:text="|月別スケジュール (${year}/${month})|">月別スケジュール</title>
+  <title th:text="|月別スケジュール (${year}/${month} ${boardName})|">月別スケジュール</title>
 </head>
 <body>
 <div class="container-fluid bg-light">
   <div class="d-flex align-items-center mb-1">
     <a href="/" class="btn btn-outline-secondary btn-sm me-3">← トップ</a>
-    <h1 class="fs-3 mb-0" th:text="|月別スケジュール (${year}/${month})|">月別スケジュール</h1>
+    <h1 class="fs-3 mb-0" th:text="|月別スケジュール (${year}/${month} ${boardName})|">月別スケジュール</h1>
   </div>
 
   <!-- フィルターフォーム -->
