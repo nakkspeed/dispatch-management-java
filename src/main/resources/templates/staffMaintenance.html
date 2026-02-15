@@ -10,25 +10,13 @@
 <body>
 <div class="container mt-3" style="max-width: 640px;">
 
-  <div class="d-flex align-items-center mb-4">
-    <a th:href="@{/edit_regular_schedules(boardId=${currentBoard.boardId})}" class="btn btn-outline-secondary btn-sm me-3">← 定期スケジュール</a>
-    <h1 class="h4 mb-0">スタッフ管理</h1>
-  </div>
+  <h1 class="h4 mb-3">スタッフ管理</h1>
 
-  <!-- ボード選択 -->
-  <form method="get" action="/staff-maintenance" class="mb-4">
-    <label class="form-label fw-bold">チーム選択</label>
-    <div class="input-group" style="max-width: 320px;">
-      <select class="form-select" name="boardId">
-        <option th:each="board : ${boards}"
-                th:value="${board.boardId}"
-                th:text="${board.boardName}"
-                th:selected="${currentBoard != null && board.boardId == currentBoard.boardId}">
-        </option>
-      </select>
-      <button type="submit" class="btn btn-outline-secondary">切替</button>
-    </div>
-  </form>
+  <!-- ボード名（固定） -->
+  <div class="mb-3">
+    <span class="fw-bold">チーム：</span>
+    <span th:text="${currentBoard.boardName}"></span>
+  </div>
 
   <!-- ボードなし -->
   <div th:if="${currentBoard == null}" class="alert alert-warning">
@@ -42,6 +30,7 @@
         スタッフ一覧
         <span class="badge bg-secondary ms-1" th:text="${staffNicknames.size()}">0</span>
       </div>
+      <small class="text-muted">※ 追加・削除・並べ替えは即時反映されます</small>
     </div>
 
     <div class="card-body p-0">
@@ -92,6 +81,11 @@
                placeholder="スタッフ名を入力してEnter" required autofocus>
       </form>
     </div>
+  </div>
+
+  <div class="text-end mt-3">
+    <a th:href="@{/edit_regular_schedules(boardId=${currentBoard.boardId})}"
+       class="btn btn-secondary">定期スケジュールに戻る</a>
   </div>
 
 </div>
