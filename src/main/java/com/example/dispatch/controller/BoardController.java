@@ -113,20 +113,6 @@ public class BoardController {
         return "redirect:/staff-maintenance?boardId=" + boardId;
     }
 
-    /** スタッフ並び順変更 (フォーム → PRG) */
-    @PostMapping("/staff/{boardId}/{idx}/move")
-    public String moveStaff(@PathVariable int boardId, @PathVariable int idx,
-            @RequestParam String direction) {
-        List<Staff> staffs = currentStaffs(boardId);
-        int swapWith = "up".equals(direction) ? idx - 1 : idx + 1;
-        if (swapWith >= 0 && swapWith < staffs.size()) {
-            Staff tmp = staffs.get(idx);
-            staffs.set(idx, staffs.get(swapWith));
-            staffs.set(swapWith, tmp);
-            boardService.updateStaffs(boardId, List.of(staffs, List.of()));
-        }
-        return "redirect:/staff-maintenance?boardId=" + boardId;
-    }
 
     private List<Staff> currentStaffs(int boardId) {
         return boardService.findAll().stream()
