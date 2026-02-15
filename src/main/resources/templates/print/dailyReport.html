@@ -4,19 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" th:href="@{/css/paper.css}">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
   <style>
     @font-face { font-family: "Yu Gothic"; src: local("Yu Gothic Medium"); font-weight: 100 400; }
     @font-face { font-family: "Yu Gothic"; src: local("Yu Gothic Bold"); font-weight: bold; }
     @page { size: A4; }
-    .am { width: 210mm; height: 150mm; vertical-align: top; }
-    .pm { width: 210mm; height: 80mm; vertical-align: top; }
-    table { border-collapse: collapse; }
-    th, td { border: solid 1px #000; }
-    pre { font-family: "Yu Gothic", "YuGothic"; font-size: 17px; line-height: 1.2em; font-weight: bold; }
   </style>
   <title>日報</title>
 </head>
-<body class="A4">
+<body class="A4 print-report print-report-bold">
   <th:block th:each="work : ${schedule.works}">
     <th:block th:if="${!#strings.isEmpty(work.tasks[0].taskContents) or !#strings.isEmpty(work.tasks[1].taskContents)}">
       <section class="sheet padding-15mm">

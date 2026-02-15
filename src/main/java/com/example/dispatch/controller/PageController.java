@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -248,7 +249,21 @@ public class PageController {
             @PathVariable int boardId,
             @RequestParam String fromDate,
             @RequestParam(required = false, defaultValue = "false") boolean confirmed,
-            Model model) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
+        // スタッフ未定義チェック
+        Board board = boardService.findAll().stream()
+                .filter(b -> b.boardId() == boardId)
+                .findFirst()
+                .orElse(null);
+        boolean hasStaffs = board != null && !board.staffs().isEmpty()
+                && !board.staffs().get(0).isEmpty();
+        if (!hasStaffs) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "スタッフが登録されていません。スタッフ管理画面で登録してください。");
+            return "redirect:/edit_regular_schedules?boardId=" + boardId;
+        }
+
         String[] parts = fromDate.split("-");
         int year = Integer.parseInt(parts[0]);
         int month = Integer.parseInt(parts[1]);

@@ -1,0 +1,86 @@
+/* === 共通 === */
+body {
+  font-family: "BIZ UDPGothic", "Yu Gothic", YuGothic, sans-serif;
+}
+
+/* === スケジュールテーブル共通 === */
+table.table {
+  table-layout: fixed;
+}
+
+.cut {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: "BIZ UDPGothic", "Yu Gothic", YuGothic, sans-serif;
+}
+
+.table-cellhover > tbody > tr > td:hover {
+  background-color: rgb(253, 247, 238) !important;
+}
+
+.table-cellhover > tbody > tr:hover > td {
+  background-color: inherit;
+}
+
+/* 定期スケジュール: ホバー色上書き */
+.table-cellhover-cyan > tbody > tr > td:hover {
+  background-color: lightcyan !important;
+}
+
+.table-cellhover-cyan > tbody > tr:hover > td {
+  background-color: inherit;
+}
+
+/* === ボード作成: ルート設定 === */
+.route-item {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.route-item:has(> .route-delete-btn) .route-input {
+  border-radius: 0.375rem 0 0 0.375rem;
+  border-right: none;
+}
+
+.route-input {
+  width: 120px;
+  min-width: 80px;
+  text-align: center;
+}
+
+/* === 印刷: 日報 === */
+.print-report {
+  font-family: "Yu Gothic", YuGothic, sans-serif;
+}
+
+.print-report .am {
+  width: 210mm;
+  height: 150mm;
+  vertical-align: top;
+}
+
+.print-report .pm {
+  width: 210mm;
+  height: 80mm;
+  vertical-align: top;
+}
+
+.print-report table {
+  border-collapse: collapse;
+}
+
+.print-report th,
+.print-report td {
+  border: solid 1px #000;
+}
+
+.print-report pre {
+  font-family: "Yu Gothic", "YuGothic";
+  font-size: 17px;
+  line-height: 1.2em;
+}
+
+.print-report-bold pre {
+  font-weight: bold;
+}

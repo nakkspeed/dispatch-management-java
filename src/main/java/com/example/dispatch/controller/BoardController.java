@@ -64,7 +64,7 @@ public class BoardController {
             return renderBoardCreateWithError(model, boardId, boardName, filteredRoutes,
                     "ボードID " + boardId + " は既に使用されています。別のIDを指定してください。");
         }
-        return "redirect:/staff-maintenance?boardId=" + boardId;
+        return "redirect:/edit_regular_schedules?boardId=" + boardId;
     }
 
     private String renderBoardCreateWithError(Model model, Integer boardId, String boardName,
