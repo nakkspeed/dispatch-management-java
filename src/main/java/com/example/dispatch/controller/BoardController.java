@@ -5,7 +5,6 @@ import com.example.dispatch.model.ScheduleMonth;
 import com.example.dispatch.model.Staff;
 import com.example.dispatch.service.BoardService;
 import com.example.dispatch.service.ScheduleService;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,7 +41,6 @@ public class BoardController {
     /** ボード新規作成 (フォーム送信 → PRGパターン) */
     @PostMapping("/board/create")
     public String createBoard(
-            @RequestParam int boardId,
             @RequestParam String boardName,
             @RequestParam(required = false) List<String> routes,
             Model model) {
@@ -52,25 +50,19 @@ public class BoardController {
                 .collect(Collectors.toList()) : List.of();
 
         if (boardName.isBlank()) {
-            return renderBoardCreateWithError(model, boardId, boardName, routes, "ボード名を入力してください");
+            return renderBoardCreateWithError(model, boardName, routes, "ボード名を入力してください");
         }
         if (filteredRoutes.isEmpty()) {
-            return renderBoardCreateWithError(model, boardId, boardName, routes, "ルートを1件以上入力してください");
+            return renderBoardCreateWithError(model, boardName, routes, "ルートを1件以上入力してください");
         }
 
-        try {
-            boardService.createBoard(boardId, boardName, filteredRoutes);
-        } catch (DataIntegrityViolationException e) {
-            return renderBoardCreateWithError(model, boardId, boardName, filteredRoutes,
-                    "ボードID " + boardId + " は既に使用されています。別のIDを指定してください。");
-        }
+        int boardId = boardService.createBoard(boardName, filteredRoutes);
         return "redirect:/edit_regular_schedules?boardId=" + boardId;
     }
 
-    private String renderBoardCreateWithError(Model model, Integer boardId, String boardName,
+    private String renderBoardCreateWithError(Model model, String boardName,
             List<String> routes, String errorMessage) {
         model.addAttribute("routes", (routes != null && !routes.isEmpty()) ? new ArrayList<>(routes) : List.of("内勤"));
-        model.addAttribute("boardId", boardId);
         model.addAttribute("boardName", boardName != null ? boardName : "");
         model.addAttribute("errorMessage", errorMessage);
         return "boardCreate";

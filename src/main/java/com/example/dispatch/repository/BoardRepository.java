@@ -29,6 +29,13 @@ public class BoardRepository {
         );
     }
 
+    public int findNextBoardId() {
+        return jdbc.queryForObject(
+                "SELECT COALESCE(MAX(board_id), 0) + 1 FROM boards",
+                Integer.class
+        );
+    }
+
     public void create(int boardId, String boardName) {
         try {
             String staffsJson = objectMapper.writeValueAsString(List.of(List.of(), List.of()));

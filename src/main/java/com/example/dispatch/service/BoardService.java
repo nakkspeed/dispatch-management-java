@@ -26,9 +26,11 @@ public class BoardService {
 
     /** ボードと定期スケジュール (5週×7日) を一括作成する */
     @Transactional
-    public void createBoard(int boardId, String boardName, List<String> routes) {
+    public int createBoard(String boardName, List<String> routes) {
+        int boardId = boardRepository.findNextBoardId();
         boardRepository.create(boardId, boardName);
         regularScheduleRepository.create(boardId, routes);
+        return boardId;
     }
 
     /** 指定ボードのスタッフ一覧を更新する */

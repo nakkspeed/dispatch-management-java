@@ -22,14 +22,6 @@
 
       <div class="card-body">
 
-        <div class="mb-3">
-          <label for="boardId" class="form-label fw-bold">ボードID <span class="text-danger">*</span></label>
-          <input type="number" class="form-control" id="boardId" name="boardId"
-                 style="max-width:160px;" placeholder="例: 1" min="0"
-                 th:value="${boardId}" required>
-          <div class="form-text">整数で指定してください。既存IDと重複すると登録できません。</div>
-        </div>
-
         <div class="mb-4">
           <label for="boardName" class="form-label fw-bold">ボード名 <span class="text-danger">*</span></label>
           <input type="text" class="form-control" id="boardName" name="boardName"
